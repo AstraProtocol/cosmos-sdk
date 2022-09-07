@@ -127,7 +127,7 @@ func TestDuplicatesMsgCreateValidator(t *testing.T) {
 	pk1, pk2 := PKs[0], PKs[1]
 	tstaking := teststaking.NewHelper(t, ctx, app.StakingKeeper)
 
-	valTokens := tstaking.CreateValidatorWithValPower(addr1, pk1, 10, true)
+	valTokens := tstaking.CreateValidatorWithValPower(addr1, pk1, initPower, true)
 	app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx)
 
 	validator := tstaking.CheckValidator(addr1, types.Bonded, false)
@@ -183,7 +183,8 @@ func TestInvalidPubKeyTypeMsgCreateValidator(t *testing.T) {
 }
 
 func TestBothPubKeyTypesMsgCreateValidator(t *testing.T) {
-	app, ctx, _, valAddrs := bootstrapHandlerGenesisTest(t, 1000, 2, sdk.NewInt(1000))
+	val, _ := sdk.NewIntFromString("10000000000000000000000000")
+	app, ctx, _, valAddrs := bootstrapHandlerGenesisTest(t, 1000, 2, val)
 	ctx = ctx.WithConsensusParams(&abci.ConsensusParams{
 		Validator: &tmproto.ValidatorParams{PubKeyTypes: []string{tmtypes.ABCIPubKeyTypeEd25519, tmtypes.ABCIPubKeyTypeSecp256k1}},
 	})
@@ -208,7 +209,8 @@ func TestBothPubKeyTypesMsgCreateValidator(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(*testing.T) {
-			tstaking.CreateValidator(tc.addr, tc.pk, sdk.NewInt(10), true)
+
+			tstaking.CreateValidator(tc.addr, tc.pk, val, true)
 		})
 	}
 }
