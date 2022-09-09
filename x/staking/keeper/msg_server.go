@@ -14,6 +14,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+var (
+	DefaultMinValueCreateValidator, _ = sdk.NewIntFromString("1000000000000000000000000")
+)
+
 type msgServer struct {
 	Keeper
 }
@@ -35,10 +39,9 @@ func (k msgServer) CreateValidator(goCtx context.Context, msg *types.MsgCreateVa
 		return nil, err
 	}
 
-	minValueCreateValidator, _ := sdk.NewIntFromString("1000000000000000000000000")
-
-	if msg.Value.Amount.LT(minValueCreateValidator) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "create validator value must > 1000000000000000000000000")
+	if msg.Value.Amount.LT(DefaultMinValueCreateValidator) {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds,
+			"create validator value must > "+DefaultMinValueCreateValidator.String())
 	}
 
 	// check to see if the pubkey or sender has been registered before
